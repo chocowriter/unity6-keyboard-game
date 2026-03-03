@@ -30,7 +30,8 @@ namespace VisualKeyboard
         public Image image;
         public Image overlay;
 
-        public virtual void Highlight(bool isOn) {
+        public virtual void Highlight(bool isOn) 
+        {
             if (isOn)
                 HighlightON();
             else
@@ -38,27 +39,32 @@ namespace VisualKeyboard
         }
 
         [ContextMenu("Highlight OFF")]
-        public virtual void HighlightOFF() {
+        public virtual void HighlightOFF() 
+        {
             overlay.gameObject.SetActive(false);
         }
 
         [ContextMenu("Highlight ON")]
-        public virtual void HighlightON() {
+        public virtual void HighlightON() 
+        {
             overlay.gameObject.SetActive(true);
         }
 
-        public virtual void HighlightON(Color color) {
+        public virtual void HighlightON(Color color) 
+        {
             color.a = Mathf.Clamp(color.a, 0.19f, 0.21f);
             overlay.color = color;
             overlay.gameObject.SetActive(true);
         }
 
-        public virtual void HighlightAnimation(Color color, float fadeTime) {
+        public virtual void HighlightAnimation(Color color, float fadeTime) 
+        {
             StopAllCoroutines();
             StartCoroutine(HighlightAnimating(color, fadeTime));
         }
 
-        protected virtual IEnumerator HighlightAnimating(Color color, float fadeTime) {
+        protected virtual IEnumerator HighlightAnimating(Color color, float fadeTime) 
+        {
             float endTime = Time.time + fadeTime;
             color.a = Mathf.Clamp(color.a, 0.19f, 0.21f);
             float startAlpha = color.a;
@@ -77,9 +83,19 @@ namespace VisualKeyboard
         }
 
         // UI callback.
-        public virtual void UI_Click() {
+        public virtual void UI_Click() 
+        {
             Debug.Log($"Keyboard button is clicked: {gameObject.name}", gameObject);
             OnKeyboardButtonClick?.Invoke(this);
+        }
+
+        private void Update()
+        {
+            bool input = Input.GetKeyDown(oldKeyCode);
+            if (input == true)
+            {
+                OnKeyboardButtonClick?.Invoke(this);
+            }
         }
 
         #region Editor
@@ -106,7 +122,8 @@ namespace VisualKeyboard
         //}
 
         [ContextMenu("Editor: Set Dirty")]
-        private void Editor_SetDirty() {
+        private void Editor_SetDirty() 
+        {
             EditorUtility.SetDirty(this);
             EditorUtility.SetDirty(gameObject);
         }
