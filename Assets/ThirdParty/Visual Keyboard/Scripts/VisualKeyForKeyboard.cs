@@ -71,7 +71,8 @@ namespace VisualKeyboard
             overlay.color = color;
             overlay.gameObject.SetActive(true);
 
-            while (color.a > 0.01f) {
+            while (color.a > 0.01f) 
+            {
                 yield return null;
                 float time = 1f - ((endTime - Time.time) / fadeTime);
                 Color col = overlay.color;

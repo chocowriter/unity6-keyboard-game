@@ -64,7 +64,8 @@ namespace VisualKeyboard
         /// <param name="isON"></param>
         public virtual void HighlightAllKeys(bool isON) 
         {
-            foreach (VisualKeyForKeyboard key in keys) {
+            foreach (VisualKeyForKeyboard key in keys) 
+            {
                 key.Highlight(isON);
             }
         }
