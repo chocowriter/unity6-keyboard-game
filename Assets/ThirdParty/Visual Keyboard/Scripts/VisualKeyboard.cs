@@ -38,7 +38,8 @@ namespace VisualKeyboard
         [Tooltip("Small UI highlight mark over CapsLock key.")]
         [SerializeField] private Image shiftIndicator;
         [Tooltip("An optional UI text field to see keyboard's produced text.")]
-        [SerializeField] private Text inputTextLabel;
+        //[SerializeField] private Text inputTextLabel;
+        [SerializeField] private TMPro.TextMeshProUGUI inputText;
         [Tooltip("Should we play sound when user press a key?")]
         public bool keyPressSound;
         [Tooltip("Should we play light animation when user press a key?")]
@@ -47,11 +48,13 @@ namespace VisualKeyboard
         public Color keyPressAnimationColor;
         [SerializeField] private AudioSource audioSource;
 
-        void OnEnable() {
+        void OnEnable() 
+        {
             VisualKeyForKeyboard.OnKeyboardButtonClick += OnKeyboardButtonClick;
         }
 
-        void OnDisable() {
+        void OnDisable() 
+        {
             VisualKeyForKeyboard.OnKeyboardButtonClick -= OnKeyboardButtonClick;
         }
 
@@ -59,14 +62,16 @@ namespace VisualKeyboard
         /// Switch all keys highlight ON / OFF.
         /// </summary>
         /// <param name="isON"></param>
-        public virtual void HighlightAllKeys(bool isON) {
+        public virtual void HighlightAllKeys(bool isON) 
+        {
             foreach (VisualKeyForKeyboard key in keys) {
                 key.Highlight(isON);
             }
         }
 
         // A callback function. Don't call directly.
-        protected virtual void OnKeyboardButtonClick(VisualKeyForKeyboard key) {
+        protected virtual void OnKeyboardButtonClick(VisualKeyForKeyboard key) 
+        {
             Debug.Log($"[Visual Keyboard] Key is clicked: {key.gameObject.name}", gameObject);
             if (keyPressSound)
                 audioSource.Play();
@@ -75,21 +80,24 @@ namespace VisualKeyboard
             OnKeyClick?.Invoke(key);
 
             // Shift or CapsLock?
-            if (key.oldKeyCode is KeyCode.LeftShift or KeyCode.RightShift or KeyCode.CapsLock) {
+            if (key.oldKeyCode is KeyCode.LeftShift or KeyCode.RightShift or KeyCode.CapsLock) 
+            {
                 isShiftHold = !isShiftHold;
                 shiftIndicator.enabled = isShiftHold;
                 return;
             }
 
             // Backspace?
-            if (key.oldKeyCode is KeyCode.Backspace && inputTextLabel.text.Length > 0) {
-                inputTextLabel.text = inputTextLabel.text.Substring(0, inputTextLabel.text.Length - 1);
+            if (key.oldKeyCode is KeyCode.Backspace && inputText.text.Length > 0) 
+            {
+                inputText.text = inputText.text.Substring(0, inputText.text.Length - 1);
             }
 
             // Some character?
-            if (key.character != '\0') {
+            if (key.character != '\0') 
+            {
                 char charEntered = isShiftHold ? key.shiftedCharacter : key.character;
-                inputTextLabel.text += charEntered;
+                inputText.text += charEntered;
                 OnCharacterInput?.Invoke(charEntered);
             }
         }
@@ -98,9 +106,11 @@ namespace VisualKeyboard
         /// Try to get a key by produced character.
         /// </summary>
         /// <returns>NULL if nothing found.</returns>
-        public virtual VisualKeyForKeyboard GetKeyboardKey(char character) {
+        public virtual VisualKeyForKeyboard GetKeyboardKey(char character) 
+        {
             string charAsString = character.ToString().ToLower();
-            foreach (VisualKeyForKeyboard key in keys) {
+            foreach (VisualKeyForKeyboard key in keys) 
+            {
                 if (key.character == character)
                     return key;
             }
@@ -111,11 +121,14 @@ namespace VisualKeyboard
         /// Try to find a specific key by control path (actual for new Unity's Input System).
         /// </summary>
         /// <returns>NULL if nothing was found.</returns>
-        public virtual VisualKeyForKeyboard GetKey(string controlPath) {
+        public virtual VisualKeyForKeyboard GetKey(string controlPath) 
+        {
 
             // Try to find by direct path comparison.
-            foreach (VisualKeyForKeyboard key in keys) {
-                if (key.controlPath == controlPath) {
+            foreach (VisualKeyForKeyboard key in keys) 
+            {
+                if (key.controlPath == controlPath) 
+                {
                     // Debug.Log($"Key was found by direct path comparison: {path} (device '{name}')", gameObject);
                     return key;
                 }
@@ -124,14 +137,17 @@ namespace VisualKeyboard
 #if ENABLE_INPUT_SYSTEM
             // Try to find by binding mask.
             InputBinding searchedMask = new InputBinding(path: controlPath);
-            foreach (VisualKeyForKeyboard key in keys) {
+            foreach (VisualKeyForKeyboard key in keys) 
+            {
                 InputBinding keyMask = new InputBinding(path: key.controlPath);
-                if (searchedMask.Matches(keyMask)) {
+                if (searchedMask.Matches(keyMask)) 
+                {
                     Debug.Log($"Key was found by mask matching for path {controlPath}. Key: {key.gameObject.name}. Searched mask matches key mask", key.gameObject);
                     return key;
                 }
 
-                if (keyMask.Matches(searchedMask)) {
+                if (keyMask.Matches(searchedMask)) 
+                {
                     Debug.Log($"Key was found by mask matching for path {controlPath}. Key: {key.gameObject.name}. Key mask matches searched mask", key.gameObject);
                     return key;
                 }
@@ -165,12 +181,15 @@ namespace VisualKeyboard
         //}
 
         [ContextMenu("Editor - Check keys")]
-        private void Check() {
+        private void Check() 
+        {
             int c = 0;
 
             // Control path.
-            foreach (VisualKeyForKeyboard key in keys) {
-                if (string.IsNullOrEmpty(key.controlPath)) {
+            foreach (VisualKeyForKeyboard key in keys) 
+            {
+                if (string.IsNullOrEmpty(key.controlPath)) 
+                {
                     c++;
                     Debug.Log($"Key {key.gameObject.name} has no path.", gameObject);
                 }
@@ -178,8 +197,10 @@ namespace VisualKeyboard
             Debug.Log($"Total missed control paths: {c}", gameObject);
 
             c = 0;
-            foreach (VisualKeyForKeyboard key in keys) {
-                if (key.oldKeyCode == KeyCode.None) {
+            foreach (VisualKeyForKeyboard key in keys) 
+            {
+                if (key.oldKeyCode == KeyCode.None) 
+                {
                     c++;
                     Debug.Log($"Key {key.gameObject.name} has no key code for old system.", key.gameObject);
                 }
@@ -188,15 +209,16 @@ namespace VisualKeyboard
         }
 
         [ContextMenu("Editor - Sort children by name")]
-        private void Editor_SortChildrenByName() {
+        private void Editor_SortChildrenByName() 
+        {
 
             //keys = new List<VisualKeyForKeyboard>(keys.Count);
             //foreach (VisualKey visualKey in keys) {
             //    keys.Add(visualKey as VisualKeyForKeyboard);
             //}
             var sorted = keys.OrderBy((item) => item.gameObject.name).ToList();
-            for (int i = 0; i < sorted.Count; i++) {
-
+            for (int i = 0; i < sorted.Count; i++) 
+            {
                 Debug.Log($"{i}: {sorted[i].gameObject.name}", gameObject);
                 sorted[i].transform.SetAsLastSibling();
             }
@@ -278,9 +300,11 @@ namespace VisualKeyboard
         //        }
 
         [ContextMenu("Editor - Set Dirty")]
-        private void Editor_SetDirty() {
+        private void Editor_SetDirty() 
+        {
             keys = new List<VisualKeyForKeyboard>(keys.Count);
-            foreach (VisualKeyForKeyboard key in keys) {
+            foreach (VisualKeyForKeyboard key in keys) 
+            {
                 keys.Add(key);
                 EditorUtility.SetDirty(key);
                 EditorUtility.SetDirty(key.gameObject);
